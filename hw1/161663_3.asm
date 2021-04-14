@@ -9,31 +9,47 @@ ExitProcess Proto, dwExitCode:DWORD
 
 .data
 INCLUDE hw3.inc
+count DWORD ?
 
 .code
 main PROC
-	mov ecx, Y					;	loop counter
-	mov eax, 1					;	store X^0 to eax	
-	
-	L1 :
-		mul X					;	mult X to eax
-	loop L1						;	repeat X times
-	mov ebx, eax				;	store X^Y in ebx register
 
-	mov ecx, X					;	loop counter
-	mov eax, 1					;	store Y^0 to eax
-	
-	L2:
-		mul Y					;	mult Y to eax
-	loop L2						;	repeat Y times
+mov ecx, Y					; 
+dec ecx						; set outer loop counter
+mov eax, X					;
 
-	;	swap eax and ebx
-	mov edx, eax
-	mov eax, ebx
+L1:							; outer loop for calculate X^Y
+	mov count, ecx			; save outer loop counter
+	mov ecx, X				; set inner loop counter
+	mov edx, 0				;
+	
+	L2:						; inner loop for calculate X^Y
+		add edx, eax		; add X^(i-1) for X times -> X^i
+		loop L2				; repeat the inner loop
+	
+	mov eax, edx			;
+	mov ecx, count			; restore outer loop counter
+	loop L1					; repeat the outer loop
+
+mov ecx, X
+dec ecx
+mov ebx, Y
+
+L3:
+	mov count, ecx
+	mov ecx, Y
+	mov edx, 0
+
+	L4:
+		add edx, ebx
+		loop L4
+	
 	mov ebx, edx
+	mov ecx, count
+loop L3
 
-	call DumpRegs
+call DumpRegs
 
-	INVOKE ExitProcess, 0
+INVOKE ExitProcess, 0
 main ENDP
 END main
